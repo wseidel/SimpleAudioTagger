@@ -13,13 +13,16 @@ Este projeto é uma ferramenta web desenvolvida em Flask para auxiliar especiali
 - **Filtro e Exclusão de Categorias**: Adição e exclusão de categorias (`filter`) com vários arquivos `.wav` associados.
 
 ## Estrutura do Projeto
-. 
-├── app.py # Arquivo principal do aplicativo Flask 
-├── requirements.txt # Dependências do projeto 
-├── templates/ # Diretório de templates HTML 
-├── db_scripts/ # Diretório com scripts para inicialização
-└── README.md # Documentação do projeto
+--------
+    .
+    ├── LICENSE
+    ├── app.py # Arquivo principal do aplicativo Flask 
+    ├── requirements.txt # Dependências do projeto 
+    ├── templates/ # Diretório de templates HTML 
+    ├── db_scripts/ # Diretório com scripts para inicialização
+    └── README.md # Documentação do projeto
 
+--------
 
 ## Instalação
 
