@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Lista de Arquivos WAV{% endblock %}
+
+{% block head %}
+    <script>
+        // Função que faz a escolha e atualiza o HTML com o status da escolha
+        function updateChoice(wavFile, choice, elementId) {
+            fetch('/update_choice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ wav_file: wavFile, choice: choice }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Atualiza o HTML com a mensagem de sucesso e a escolha feita
+                const statusElement = document.getElementById(`status-${elementId}`);
+                statusElement.innerHTML = `<strong>${choice}</strong>[atualizada]`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                const statusElement = document.getElementById(`status-${elementId}`);
+                statusElement.innerHTML = `Erro ao atualizar escolha: ${error}`;
+            });
+        }
+    </script>
+
+    <style>
+        .table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .tablecondensed {
+            margin-bottom: 0;
+        }
+        .tablecondensed thead th {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f8ff;
+        }
+    </style>    
+
+
+{% endblock %}
+
+
+{% block content %}
+<h1>{{ palavra }}</h1>
+<h2>Lista de Arquivos WAV - Página {{ page }} de {{ total_pages }}</h2>
+
+
+<!-- Formulário para selecionar o filtro -->
+<form method="get" action="{{ url_for('wav_files', palavra=palavra) }}">
+    <label for="filter_type">Filtrar por Tipo:</label>
+    <select name="filter_type" id="filter_type">
+        <option value="">Todos</option>
+        {% for filter in filters %}
+        <option value="{{ filter[0] }}" {% if filter_type == filter[0] %}selected{% endif %}>{{ filter[0] }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
+
+<table class="tablecondensed table table-striped">
+    <thead>
+        <tr>
+            <th>Nome do Arquivo</th>
+            <th>É erro?<br>TeamTat</th>
+            <th>Player</th>
+            <th>Como você julga a pronúnica ?</th>
+            <th>Sua resposta</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for wav_file, palavra, falado, tipo, is_error, docid, user_choice in wav_files %}
+        <tr>
+            <td>{{ wav_file }}</td>
+            <td>{{ is_error }}</td>
+            <td>
+                <audio controls class="w-100">
+                    <source src="{{ url_for('static', filename='wavs/' + wav_file) }}" type="audio/wav">
+                    Seu navegador não suporta o elemento de áudio.
+                </audio>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="updateChoice('{{ wav_file }}', 'Correto', '{{ wav_file }}')">Correto</button>
+                    <button class="btn btn-danger" onclick="updateChoice('{{ wav_file }}', 'Incorreto', '{{ wav_file }}')">Incorreto</button>
+                    <button class="btn btn-secondary" onclick="updateChoice('{{ wav_file }}', 'Descartar', '{{ wav_file }}')">Descartar</button>
+                </div>
+
+            </td>
+            <td>
+                <p id="status-{{ wav_file }}">{{ user_choice if user_choice else '' }}</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <!-- Controles de Paginação -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('wav_files', palavra=palavra, page=page-1, filter_type=filter_type) }}" class="btn btn-primary"> << Anterior</a>
+            {% endif %}
+            <span>    Página {{ page }} de {{ total_pages }}   </span>
+            {% if page < total_pages %}
+                <a href="{{ url_for('wav_files', palavra=palavra, page=page+1, filter_type=filter_type) }}" class="btn btn-primary">Próxima >> </a>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

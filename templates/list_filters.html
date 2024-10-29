@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Listagem de Filtros{% endblock %}
+{% block content %}
+<h2>Listagem de Filtros</h2>
+
+
+<form action="{{ url_for('add_filter') }}" method="get" style="display:inline;">
+    <button type="submit" class="btn btn-success">Criar novo filtro</button>
+</form>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Filter</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for filter in filters %}
+        <tr>
+            <td><a href="{{ url_for('view_filter', filter_text=filter[0]) }}">{{ filter[0] }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="alert alert-{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% endblock %}
