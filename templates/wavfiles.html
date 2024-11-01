@@ -17,6 +17,7 @@
                 // Atualiza o HTML com a mensagem de sucesso e a escolha feita
                 const statusElement = document.getElementById(`status-${elementId}`);
                 statusElement.innerHTML = `<strong>${choice}</strong>[atualizada]`;
+                statusElement.className = `suave_${choice}`;
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -33,17 +34,53 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             padding: 20px;
         }
-        .tablecondensed {
+/*        .tablecondensed {
             margin-bottom: 0;
         }
         .tablecondensed thead th {
             background-color: #007bff;
             color: white;
             border-color: #007bff;
-        }
+        }*/
         .table-hover tbody tr:hover {
             background-color: #f1f8ff;
         }
+        /* Escala com Transição Suave */
+        .suave_-3 { background-color: #B22222; color: #fff; }
+        .suave_-2 { background-color: #FF6347; color: #333; }
+        .suave_-1 { background-color: #FF7F50; color: #333; }
+        .suave_0  { background-color: #FFFFFF; color: #333; }
+        .suave_1  { background-color: #98FB98; color: #333; }
+        .suave_2  { background-color: #32CD32; color: #fff; }
+        .suave_3  { background-color: #228B22; color: #fff; }
+
+
+        /* Customização para uma tabela ainda mais compacta */
+        .tablecondensed th,
+        .tablecondensed td {
+            padding: 4px 8px; /* Reduz o padding das células */
+/*            font-size: 0.875em; /* Diminui um pouco a fonte */*/
+        }
+
+        .tablecondensed .btn-group .btn {
+            padding: 4px 8px; /* Reduz o padding dos botões */
+/*            font-size: 0.75em; /* Diminui a fonte dos botões */*/
+        }
+
+        .tablecondensed audio {
+            height: 25px; /* Ajusta a altura do player de áudio */
+        }
+
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+            border-radius: 20px;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+
+
     </style>    
 
 
@@ -51,28 +88,41 @@
 
 
 {% block content %}
-<h1>{{ palavra }}</h1>
-<h2>Lista de Arquivos WAV - Página {{ page }} de {{ total_pages }}</h2>
 
 
-<!-- Formulário para selecionar o filtro -->
-<form method="get" action="{{ url_for('wav_files', palavra=palavra) }}">
-    <label for="filter_type">Filtrar por Tipo:</label>
-    <select name="filter_type" id="filter_type">
-        <option value="">Todos</option>
-        {% for filter in filters %}
-        <option value="{{ filter[0] }}" {% if filter_type == filter[0] %}selected{% endif %}>{{ filter[0] }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Filtrar</button>
-</form>
+<h2>Palavra: [{{ palavra }}]</h2>
+
+<div class="d-flex justify-content-between mb-2">
+
+    <div>
+        <form method="get" action="{{ url_for('wav_files', palavra=palavra) }}">
+            <div class="input-group">
+            <select name="filter_type" id="filter_type" class="form-select"  >
+                <option value="">Todos</option>
+                {% for filter in filters %}
+                <option value="{{ filter[0] }}" {% if filter_type == filter[0] %}selected{% endif %}>{{ filter[0] }}</option>
+                {% endfor %}
+            </select>
+
+              <button type="submit" class="btn btn-custom">Aplicar Filtro</button>
+            </div>
+        </form>
+    </div>
 
 
-<table class="tablecondensed table table-striped">
+    <!-- Botão para abrir o modal de explicação sobre a escala (alinhado à direita) -->
+    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#escalaModal">
+        Explicação sobre a Escala
+    </button>
+</div>
+
+
+
+<table class="tablecondensed table table-striped table-sm">
     <thead>
         <tr>
             <th>Nome do Arquivo</th>
-            <th>É erro?<br>TeamTat</th>
+            <th>Anotação<br>TeamTat.</th>
             <th>Player</th>
             <th>Como você julga a pronúnica ?</th>
             <th>Sua resposta</th>
@@ -82,23 +132,27 @@
         {% for wav_file, palavra, falado, tipo, is_error, docid, user_choice in wav_files %}
         <tr>
             <td>{{ wav_file }}</td>
-            <td>{{ is_error }}</td>
+            <td>{{ 'Errado' if is_error == 'S' else 'Pronúncia Ok' }}</td>
             <td>
                 <audio controls class="w-100">
                     <source src="{{ url_for('static', filename='wavs/' + wav_file) }}" type="audio/wav">
                     Seu navegador não suporta o elemento de áudio.
                 </audio>
             </td>
-            <td>
+            <td class="text-center">
                 <div class="btn-group">
-                    <button class="btn btn-success" onclick="updateChoice('{{ wav_file }}', 'Correto', '{{ wav_file }}')">Correto</button>
-                    <button class="btn btn-danger" onclick="updateChoice('{{ wav_file }}', 'Incorreto', '{{ wav_file }}')">Incorreto</button>
-                    <button class="btn btn-secondary" onclick="updateChoice('{{ wav_file }}', 'Descartar', '{{ wav_file }}')">Descartar</button>
+                    <button class="btn suave_-3" onclick="updateChoice('{{ wav_file }}', '-3', '{{ wav_file }}')">-3</button>
+                    <button class="btn suave_-2" onclick="updateChoice('{{ wav_file }}', '-2', '{{ wav_file }}')">-2</button>
+                    <button class="btn suave_-1" onclick="updateChoice('{{ wav_file }}', '-1', '{{ wav_file }}')">-1</button>
+                    <button class="btn suave_0"  onclick="updateChoice('{{ wav_file }}', '0', '{{ wav_file }}')">0</button>
+                    <button class="btn suave_1"  onclick="updateChoice('{{ wav_file }}', '1', '{{ wav_file }}')">1</button>
+                    <button class="btn suave_2"  onclick="updateChoice('{{ wav_file }}', '2', '{{ wav_file }}')">2</button>
+                    <button class="btn suave_3"  onclick="updateChoice('{{ wav_file }}', '3', '{{ wav_file }}')">3</button>
                 </div>
 
             </td>
-            <td>
-                <p id="status-{{ wav_file }}">{{ user_choice if user_choice else '' }}</p>
+            <td class="text-center">
+                <p class="suave_{{ user_choice }}" id="status-{{ wav_file }}">{{ user_choice if user_choice else '' }}</p>
             </td>
         </tr>
         {% endfor %}
@@ -120,5 +174,36 @@
 
     </div>
 </div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="escalaModal" tabindex="-1" aria-labelledby="escalaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="escalaModalLabel">Explicação sobre a Escala de Votação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta escala permite avaliar a qualidade da pronúncia de acordo com os seguintes critérios:</p>
+                <ul>
+                    <li><strong class="btn suave_-3">-3:</strong> Pronúncia Incorreta, Claramente.</li>
+                    <li><strong class="btn suave_-2">-2:</strong> Pronúncia Incorreta, um pouco dificil de decidir.</li>
+                    <li><strong class="btn suave_-1">-1:</strong> Pronúncia Incorreta, difícil de decidir.</li>
+                    <li><strong class="btn suave_0">0:</strong> Não consigo definir!</li>
+                    <li><strong class="btn suave_1">1:</strong> Pronúncia Correta, difícil de decidir.</li>
+                    <li><strong class="btn suave_2">2:</strong> Pronúncia Correta, um pouco dificil de decidir.</li>
+                    <li><strong class="btn suave_3">3:</strong> Pronúncia Correta, Claramente.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 {% endblock %}

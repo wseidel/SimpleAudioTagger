@@ -1,23 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+
+
+{% block head %}
+    <style>
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+            border-radius: 20px;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+
+    </style>
+{% endblock %}
+
 {% block content %}
 <div class="text-center">
     <h1>Bem-vindo(a), {{ current_user.username }}!</h1>
     <p>Selecione uma das pseudo-palavras para avaliar.</p>
 </div>
 
-<!-- Formulário para selecionar o filtro -->
-<form method="get" action="{{ url_for('home') }}">
-    <label for="filter_type">Filtrar por:</label>
-    <select name="filter_type" id="filter_type">
-        <option value="">Todos</option>
-        {% for filter in filters %}
-        <option value="{{ filter[0] }}" {% if filter_type == filter[0] %}selected{% endif %}>{{ filter[0] }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Filtrar</button>
-</form>
+<div class="d-flex justify-content-between mb-2">
 
+    <div>
+        <form method="get" action="{{ url_for('home') }}">
+            <div class="input-group">
+            <select name="filter_type" id="filter_type" class="form-select"  >
+                <option value="">Todos</option>
+                {% for filter in filters %}
+                <option value="{{ filter[0] }}" {% if filter_type == filter[0] %}selected{% endif %}>{{ filter[0] }}</option>
+                {% endfor %}
+            </select>
+
+              <button type="submit" class="btn btn-custom">Aplicar Filtro</button>
+            </div>
+        </form>
+    </div>
+
+
+</div>
 
 
 <div class="container mt-5">
